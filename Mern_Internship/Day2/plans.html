@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Plans - RechargeApp</title>
+  <!-- Tailwind CDN for demo -->
+  
+  
+</head>
+<body class="bg-gray-50 text-gray-800">
+<header class="bg-white shadow">
+  <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+    <a href="index.html" class="text-xl font-semibold">RechargeApp</a>
+    <nav class="space-x-3">
+      <a href="index.html" class="hover:underline">Login</a>
+      <a href="signup.html" class="hover:underline">Signup</a>
+      <a href="recharge.html" class="hover:underline">Recharge</a>
+      <a href="dashboard.html" class="hover:underline">Dashboard</a>
+      <a href="admin.html" class="hover:underline">Admin</a>
+    </nav>
+  </div>
+</header>
+<main class="max-w-4xl mx-auto p-6">
+
+<section class="bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-semibold mb-4">Plan Selection</h1>
+  <div id="loading" class="mb-4">Loading plans...</div>
+  <div id="plansGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  <div id="selectedPlan" class="mt-6 hidden bg-gray-50 border p-4 rounded">
+    <h2 class="font-semibold">Selected Plan</h2>
+    <div id="selectedDetails" class="mt-2"></div>
+    <div class="mt-4">
+      <a id="proceedBtn" href="payment.html" class="inline-block px-4 py-2 bg-blue-600 text-white rounded">Proceed to Payment</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="text-center text-sm p-6 text-gray-500">
+  © RechargeApp — Demo
+</footer>
+</body>
+</html>

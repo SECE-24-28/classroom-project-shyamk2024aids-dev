@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Recharge - RechargeApp</title>
+  <!-- Tailwind CDN for demo -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 text-gray-800">
+<header class="bg-white shadow">
+  <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+    <a href="index.html" class="text-xl font-semibold">RechargeApp</a>
+    <nav class="space-x-3">
+      <a href="index.html" class="hover:underline">Login</a>
+      <a href="signup.html" class="hover:underline">Signup</a>
+      <a href="recharge.html" class="hover:underline">Recharge</a>
+      <a href="dashboard.html" class="hover:underline">Dashboard</a>
+      <a href="admin.html" class="hover:underline">Admin</a>
+    </nav>
+  </div>
+</header>
+<main class="max-w-4xl mx-auto p-6">
+
+<section class="bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-semibold mb-4">Mobile Recharge</h1>
+  <form id="rechargeForm" class="space-y-4" onsubmit="return gotoPlans(event)">
+    <label class="block">
+      <span class="text-sm">Mobile Number</span>
+      <input id="mobileNumber" type="tel" pattern='[0-9]{10}' required placeholder="10-digit mobile number" class="mt-1 block w-full rounded-md border-gray-300" />
+    </label>
+    <label class="block">
+      <span class="text-sm">Operator</span>
+      <select id="operator" required class="mt-1 block w-full rounded-md border-gray-300">
+        <option value="">Select operator</option>
+        <option>Jio</option>
+        <option>Vodafone</option>
+        <option>Idea</option>
+        <option>Aircel</option>
+        <option>BSNL</option>
+      </select>
+    </label>
+    <label class="block">
+      <span class="text-sm">Type</span>
+      <select id="rechargeType" class="mt-1 block w-full rounded-md border-gray-300">
+        <option value="prepaid">Prepaid</option>
+        <option value="postpaid">Postpaid</option>
+      </select>
+    </label>
+    <div class="flex items-center justify-between">
+      <button class="px-4 py-2 bg-indigo-600 text-white rounded">Show Plans</button>
+      <a href="dashboard.html" class="text-blue-600 hover:underline">Go to Dashboard</a>
+    </div>
+  </form>
+</section>
+
+</main>
+<footer class="text-center text-sm p-6 text-gray-500">
+  © RechargeApp — Demo
+</footer>
+</body>
+</html>

@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RechargeNow — All-in-One</title>
+<style>
+  :root{
+    --bg:#f2f2f2; --card:#fff; --primary:#0b75d1; --muted:#666;
+  }
+  [data-theme="dark"]{
+    --bg:#0f1720; --card:#0b1220; --primary:#3aa0ff; --muted:#9aa4b2;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:var(--bg); color:var(--muted);
+  }
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; background:var(--primary); color:#fff;
+  }
+  .brand{font-weight:700; font-size:18px}
+  .nav-actions{display:flex; gap:10px; align-items:center}
+  .nav-actions button, .nav-actions a{background:transparent; border:0; color:#fff; cursor:pointer; font-weight:600;}
+  .container{max-width:980px; margin:26px auto; padding:20px;}
+  .card{background:var(--card); border-radius:12px; padding:18px; box-shadow: 0 6px 18px rgba(2,6,23,0.08);}
+  .grid{display:grid; gap:16px}
+  .two{grid-template-columns:1fr 360px;}
+  h1,h2{margin:0 0 12px 0; color:var(--muted)}
+  label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px;}
+  input[type="text"], input[type="email"], input[type="password"], input[type="number"], select{
+    width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e6e9ef; background:transparent; color:var(--muted);
+  }
+  button.primary{background:var(--primary); color:#fff; border:0; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:700;}
+  .muted{color:var(--muted)}
+  .small{font-size:13px}
+  .center{text-align:center}
+  .hidden{display:none}
+  .plans{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px}
+  .plan{border-radius:10px; padding:12px; background:linear-gradient(180deg, rgba(0,0,0,0.02), transparent); border:1px solid rgba(0,0,0,0.04);}
+  .plan .price{font-weight:800; color:var(--primary); font-size:18px}
+  .operators{display:flex; gap:8px; margin-bottom:12px}
+  .chip{padding:8px 10px; border-radius:20px; cursor:pointer; border:1px solid rgba(0,0,0,0.06); background:transparent; font-weight:600}
+  .active-chip{background:var(--primary); color:#fff; border-color:transparent}
+  table{width:100%; border-collapse:collapse; font-size:14px}
+  th, td{padding:10px; border-bottom:1px solid rgba(0,0,0,0.06); text-align:left; color:var(--muted)}
+  .danger{background:#ffefef; color:#b21c1c; border:1px solid #ffdede; padding:6px 8px; border-radius:8px; cursor:pointer;}
+  .ok{background:#eef9f1; color:#0b7a3a; padding:6px 8px; border-radius:8px; border:1px solid #dff4e0;}
+  .flex{display:flex;gap:8px; align-items:center}
+  .right{justify-self:end}
+  .small-ghost{background:transparent; border:1px solid rgba(0,0,0,0.06); padding:8px 10px; border-radius:8px; cursor:pointer}
+  .top-row{display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:12px}
+  .badge{font-size:12px; padding:6px 8px; border-radius:999px; background:rgba(0,0,0,0.04)}
+  footer{max-width:980px;margin:24px auto;color:var(--muted);font-size:13px;text-align:center}
+  /* responsive */
+  @media (max-width:880px){
+    .two{grid-template-columns:1fr}
+    .nav-actions .hide-sm{display:none}
+  }
+</style>
+</head>
+<body data-theme="light">
+
+<nav>
+  <div class="brand">RechargeNow</div>
+  <div class="nav-actions">
+    <a onclick="go('home')">Home</a>
+    <a onclick="go('plans')">Plans</a>
+    <a onclick="go('history')">My History</a>
+    <a onclick="go('adminLogin')" class="hide-sm">Admin</a>
+    <button id="themeToggle" title="Toggle theme">🌙</button>
+    <div id="authArea" style="display:inline-flex;align-items:center;gap:8px;">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <!-- HOME / RECHARGE -->
+  <div id="page-home" class="card">
+    <div class="top-row">
+      <div>
+        <h1>Quick Recharge</h1>
+        <div class="small muted">Recharge quickly — choose plan or enter amount</div>
+      </div>
+      <div class="flex">
+        <div class="badge" id="welcomeBadge">Not signed in</div>
+      </div>
+    </div>
+
+    <div class="grid two">
+      <div>
+        <form id="rechargeForm">
+          <label>Mobile Number</label>
+          <input type="text" id="mobile" placeholder="e.g. 9876543210" required pattern="[0-9]{10}">
+          <label>Operator</label>
+          <select id="operatorSelect">
+            <option value="Airtel">Airtel</option>
+            <option value="Jio">Jio</option>
+            <option value="VI">VI</option>
+            <option value="BSNL">BSNL</option>
+          </select>
+          <label>Amount (₹)</label>
+          <input type="number" id="amountInput" placeholder="Enter amount" min="1" required>
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button class="primary" type="submit">Proceed to Payment</button>
+            <button type="button" class="small-ghost" onclick="document.getElementById('amountInput').value=''">Reset</button>
+          </div>
+        </form>
+
+        <div id="rechargeMsg" class="small muted" style="margin-top:12px"></div>
+
+        <hr style="margin:18px 0">
+
+        <h2>Popular Plans</h2>
+        <div class="operators" id="operatorChips">
+          <div class="chip active-chip" data-op="Airtel" onclick="selectOperatorChip(this)">Airtel</div>
+          <div class="chip" data-op="Jio" onclick="selectOperatorChip(this)">Jio</div>
+          <div class="chip" data-op="VI" onclick="selectOperatorChip(this)">VI</div>
+          <div class="chip" data-op="BSNL" onclick="selectOperatorChip(this)">BSNL</div>
+        </div>
+
+        <div id="plansList" class="plans"></div>
+      </div>
+
+      <div>
+        <div class="card" style="padding:14px;">
+          <h2 class="small muted">Selected</h2>
+          <div style="margin-top:10px">
+            <div><strong>Mobile:</strong> <span id="selMob">—</span></div>
+            <div><strong>Operator:</strong> <span id="selOp">Airtel</span></div>
+            <div><strong>Amount:</strong> ₹ <span id="selAmt">—</span></div>
+          </div>
+
+          <div style="margin-top:12px">
+            <button class="primary" id="payNowBtn" onclick="payNow()">Proceed to Payment</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px;padding:12px;">
+          <h2 class="small muted">Tips</h2>
+          <ul style="padding-left:18px;color:var(--muted);margin:6px 0">
+            <li>Use a valid 10-digit mobile number.</li>
+            <li>Plans auto-fill the amount for convenience.</li>
+            <li>Admin can view users and recharge history (demo only).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANS PAGE -->
+  <div id="page-plans" class="card hidden">
+    <div class="top-row">
+      <div><h1>Recharge Plans</h1><div class="small muted">Select a plan to auto-fill the recharge amount</div></div>
+      <div><button class="small-ghost" onclick="go('home')">Back</button></div>
+    </div>
+
+    <div style="margin-top:12px" id="plansContainer"></div>
+  </div>
+
+  <!-- PAYMENT PAGE -->
+  <div id="page-payment" class="card hidden">
+    <div class="top-row">
+      <div><h1>Payment</h1><div class="small muted">Complete payment to finish recharge</div></div>
+      <div><button class="small-ghost" onclick="go('home')">Cancel</button></div>
+    </div>
+
+    <div class="grid two" style="margin-top:12px">
+      <div>
+        <div style="margin-bottom:8px"><strong>Recharge Details</strong></div>
+        <div class="card" style="padding:12px;margin-bottom:12px">
+          <div><strong>Mobile:</strong> <span id="payMobile"></span></div>
+          <div><strong>Operator:</strong> <span id="payOperator"></span></div>
+          <div><strong>Amount:</strong> ₹ <span id="payAmount"></span></div>
+        </div>
+
+        <div style="margin-top:6px"><strong>Choose Payment Method</strong></div>
+        <div style="margin-top:8px; display:flex; gap:8px">
+          <button class="chip active-chip" id="methodCard" onclick="selectMethod('card')">Card</button>
+          <button class="chip" id="methodUPI" onclick="selectMethod('upi')">UPI</button>
+        </div>
+
+        <div id="cardForm" style="margin-top:12px">
+          <label>Card Number</label>
+          <input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" maxlength="19">
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <div style="flex:1">
+              <label>Expiry</label>
+              <input type="text" id="cardExp" placeholder="MM/YY" maxlength="5">
+            </div>
+            <div style="width:120px">
+              <label>CVV</label>
+              <input type="password" id="cardCVV" placeholder="123" maxlength="4">
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <button class="primary" onclick="processCardPayment()">Pay ₹ <span id="cardPayAmt"></span></button>
+          </div>
+        </div>
+
+        <div id="upiForm" class="hidden" style="margin-top:12px">
+          <label>UPI ID</label>
+          <input type="text" id="upiId" placeholder="example@upi">
+          <div style="margin-top:12px">
+            <button class="primary" onclick="processUpiPayment()">Pay via UPI</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div>
+        <div class="card" style="padding:12px">
+          <h2 class="small muted">Payment Info</h2>
+          <div style="margin-top:8px;color:var(--muted);font-size:14px">
+            This is a demo payment flow. Card/UPI are simulated. On success the recharge is recorded in your history.
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px;padding:12px">
+          <h2 class="small muted">Recent Recharges</h2>
+          <div id="recentRechargeList" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENT SUCCESS -->
+  <div id="page-success" class="card hidden center">
+    <h1>Payment Successful ✅</h1>
+    <div class="small muted" id="successMsg">Your recharge is complete.</div>
+    <div style="margin-top:12px">
+      <button class="primary" onclick="go('home')">Back to Home</button>
+    </div>
+  </div>
+
+  <!-- SIGNUP / LOGIN PAGES -->
+  <div id="page-auth" class="card hidden">
+    <div class="top-row">
+      <div><h1 id="authTitle">Sign Up</h1><div class="small muted" id="authSubtitle">Create a new account</div></div>
+      <div><button class="small-ghost" onclick="go('home')">Close</button></div>
+    </div>
+
+    <div style="margin-top:12px; max-width:520px">
+      <form id="authForm">
+        <div id="nameRow">
+          <label>Name</label>
+          <input type="text" id="authName" required>
+        </div>
+        <label>Email</label>
+        <input type="email" id="authEmail" required>
+        <label>Password</label>
+        <input type="password" id="authPassword" required>
+        <div style="margin-top:12px">
+          <button class="primary" type="submit" id="authSubmit">Sign up</button>
+          <button type="button" class="small-ghost" style="margin-left:8px" onclick="toggleAuth()">Switch to Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- HISTORY PAGE -->
+  <div id="page-history" class="card hidden">
+    <div class="top-row">
+      <div><h1>My Recharge History</h1><div class="small muted">All your recharges (demo stored locally)</div></div>
+      <div><button class="small-ghost" onclick="exportHistory()">Export JSON</button></div>
+    </div>
+
+    <div style="margin-top:12px">
+      <table id="historyTable">
+        <thead>
+          <tr><th>When</th><th>Mobile</th><th>Operator</th><th>Amount (₹)</th><th>Status</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ADMIN LOGIN -->
+  <div id="page-admin-login" class="card hidden">
+    <div class="top-row">
+      <div><h1>Admin Login</h1><div class="small muted">Demo admin portal</div></div>
+      <div><button class="small-ghost" onclick="go('home')">Back</button></div>
+    </div>
+
+    <form id="adminLoginForm" style="margin-top:12px; max-width:420px">
+      <label>Email</label>
+      <input type="email" id="adminEmail" required>
+      <label>Password</label>
+      <input type="password" id="adminPassword" required>
+      <div style="margin-top:12px">
+        <button class="primary" type="submit">Login as Admin</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ADMIN DASHBOARD -->
+  <div id="page-admin-dashboard" class="card hidden">
+    <div class="top-row">
+      <div><h1>Admin Dashboard</h1><div class="small muted">Manage users & view recharge history</div></div>
+      <div><button class="small-ghost" onclick="adminLogout()">Logout</button></div>
+    </div>
+
+    <div style="margin-top:12px" class="grid">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="small muted">Total Users</div>
+            <div style="font-weight:800;font-size:22px" id="adminTotalUsers">0</div>
+          </div>
+          <div>
+            <div class="small muted">Total Recharges</div>
+            <div style="font-weight:800;font-size:22px" id="adminTotalRecharges">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="small muted">Users</h2>
+        <table id="adminUsersTable">
+          <thead><tr><th>Name</th><th>Email</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2 class="small muted">Recharge Records</h2>
+        <table id="adminRechargesTable">
+          <thead><tr><th>When</th><th>User</th><th>Mobile</th><th>Operator</th><th>Amount</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>Demo frontend only • Data stored in browser localStorage • Not for production</footer>
+
+<script>
+/* ======================
+   Data utils (localStorage)
+   ====================== */
+const LS_USERS = "rn_users_v1";
+const LS_SESS = "rn_session_v1";
+const LS_RECH = "rn_recharges_v1";
+const LS_THEME = "rn_theme_v1";
+const ADMIN_CREDENTIALS = {email:"admin@recharge.local", password:"admin123"}; // demo
+
+function loadUsers(){ return JSON.parse(localStorage.getItem(LS_USERS) || "[]"); }
+function saveUsers(u){ localStorage.setItem(LS_USERS, JSON.stringify(u)); }
+function loadSession(){ return JSON.parse(localStorage.getItem(LS_SESS) || "null"); }
+function saveSession(s){ localStorage.setItem(LS_SESS, JSON.stringify(s)); }
+function clearSession(){ localStorage.removeItem(LS_SESS); }
+function loadRecharges(){ return JSON.parse(localStorage.getItem(LS_RECH) || "[]"); }
+function saveRecharges(r){ localStorage.setItem(LS_RECH, JSON.stringify(r)); }
+function setTheme(t){ localStorage.setItem(LS_THEME, t); document.body.setAttribute("data-theme", t); document.getElementById('themeToggle').textContent = t==='dark'?'☀️':'🌙'; }
+function getTheme(){ return localStorage.getItem(LS_THEME) || 'light'; }
+
+/* ======================
+   Init default demo data
+   ====================== */
+(function initDemo(){
+  // ensure arrays exist
+  if(!localStorage.getItem(LS_USERS)){
+    const demoUsers = [
+      {name:"Alice", email:"alice@example.com", password:"alice123"},
+      {name:"Bob", email:"bob@example.com", password:"bob123"},
+    ];
+    saveUsers(demoUsers);
+  }
+  if(!localStorage.getItem(LS_RECH)){
+    saveRecharges([]);
+  }
+  // apply theme
+  setTheme(getTheme());
+})();
+
+/* ======================
+   SPA navigation
+   ====================== */
+function hideAll(){
+  document.querySelectorAll('[id^="page-"]').forEach(el => el.classList.add('hidden'));
+}
+function go(page){
+  hideAll();
+  document.getElementById("page-"+page).classList.remove('hidden');
+  refreshUI();
+  if(page === 'plans') renderPlansPage();
+  if(page === 'payment') renderPaymentPage();
+  if(page === 'history') renderHistory();
+  if(page === 'admin-dashboard') renderAdminDashboard();
+}
+
+/* ======================
+   Auth UI
+   ====================== */
+function refreshAuthArea(){
+  const authArea = document.getElementById('authArea');
+  const sess = loadSession();
+  authArea.innerHTML = '';
+  if(sess && sess.type === 'user'){
+    const btn = document.createElement('button'); btn.textContent = 'Logout'; btn.onclick = logout;
+    const profile = document.createElement('a'); profile.textContent = sess.name; profile.style.color='#fff'; profile.onclick = ()=>go('history');
+    authArea.appendChild(profile);
+    authArea.appendChild(btn);
+    document.getElementById('welcomeBadge').textContent = "Hi, " + sess.name;
+  } else {
+    const s = document.createElement('button'); s.textContent = 'Sign up'; s.onclick = ()=>openAuth('signup');
+    const l = document.createElement('button'); l.textContent = 'Login'; l.onclick = ()=>openAuth('login');
+    authArea.appendChild(s); authArea.appendChild(l);
+    document.getElementById('welcomeBadge').textContent = "Not signed in";
+  }
+}
+function openAuth(mode){
+  document.getElementById('authTitle').textContent = mode==='signup'?'Sign Up':'Login';
+  document.getElementById('authSubtitle').textContent = mode==='signup'?'Create a new account':'Welcome back — login';
+  document.getElementById('authSubmit').textContent = mode==='signup'?'Sign up':'Login';
+  document.getElementById('nameRow').style.display = mode==='signup'?'block':'none';
+  document.getElementById('authForm').onsubmit = (e)=>{
+    e.preventDefault();
+    if(mode==='signup') doSignup();
+    else doLogin();
+  };
+  go('auth');
+}
+function logout(){
+  clearSession();
+  refreshAuthArea();
+  go('home');
+}
+function doSignup(){
+  const n = document.getElementById('authName').value.trim();
+  const e = document.getElementById('authEmail').value.trim().toLowerCase();
+  const p = document.getElementById('authPassword').value;
+  if(!n || !e || !p){ alert('Please fill all'); return; }
+  const users = loadUsers();
+  if(users.find(u=>u.email===e)){ alert('Email already used'); return; }
+  users.push({name:n,email:e,password:p});
+  saveUsers(users);
+  saveSession({type:'user',email:e,name:n});
+  document.getElementById('authForm').reset();
+  refreshAuthArea();
+  go('home');
+}
+function doLogin(){
+  const e = document.getElementById('authEmail').value.trim().toLowerCase();
+  const p = document.getElementById('authPassword').value;
+  const users = loadUsers();
+  const user = users.find(u=>u.email===e && u.password===p);
+  if(!user){ alert('Invalid credentials'); return; }
+  saveSession({type:'user',email:user.email,name:user.name});
+  document.getElementById('authForm').reset();
+  refreshAuthArea();
+  go('home');
+}
+
+/* ======================
+   Admin login / dashboard
+   ====================== */
+document.getElementById('adminLoginForm').onsubmit = (e)=>{
+  e.preventDefault();
+  const em = document.getElementById('adminEmail').value.trim().toLowerCase();
+  const pw = document.getElementById('adminPassword').value;
+  if(em === ADMIN_CREDENTIALS.email && pw === ADMIN_CREDENTIALS.password){
+    saveSession({type:'admin', email:em, name:'Admin'});
+    go('admin-dashboard');
+    refreshAuthArea();
+  } else {
+    alert('Invalid admin credentials (demo: admin@recharge.local / admin123)');
+  }
+};
+function adminLogout(){
+  clearSession(); refreshAuthArea(); go('home');
+}
+function renderAdminDashboard(){
+  const users = loadUsers();
+  const rechs = loadRecharges();
+  document.getElementById('adminTotalUsers').textContent = users.length;
+  document.getElementById('adminTotalRecharges').textContent = rechs.length;
+
+  // users table
+  const ut = document.querySelector('#adminUsersTable tbody'); ut.innerHTML='';
+  users.forEach((u, idx)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${u.name}</td><td>${u.email}</td>
+      <td><button class="danger" onclick="adminDeleteUser('${u.email}')">Delete</button></td>`;
+    ut.appendChild(tr);
+  });
+
+  // recharges table
+  const rt = document.querySelector('#adminRechargesTable tbody'); rt.innerHTML='';
+  rechs.slice().reverse().forEach((r, idx)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${new Date(r.when).toLocaleString()}</td>
+      <td>${r.userEmail||'—'}</td><td>${r.mobile}</td><td>${r.operator}</td><td>₹ ${r.amount}</td>
+      <td><button class="danger" onclick="adminDeleteRecharge(${r.id})">Delete</button></td>`;
+    rt.appendChild(tr);
+  });
+}
+function adminDeleteUser(email){
+  if(!confirm('Delete user '+email+'?')) return;
+  let users = loadUsers(); users = users.filter(u=>u.email!==email); saveUsers(users);
+  // also remove their recharges
+  let rechs = loadRecharges(); rechs = rechs.filter(r=>r.userEmail!==email); saveRecharges(rechs);
+  renderAdminDashboard();
+  alert('Deleted');
+}
+function adminDeleteRecharge(id){
+  if(!confirm('Delete recharge record?')) return;
+  let rechs = loadRecharges(); rechs = rechs.filter(r=>r.id!==id); saveRecharges(rechs);
+  renderAdminDashboard();
+  alert('Deleted');
+}
+
+/* ======================
+   Plans & selection
+   ====================== */
+const SAMPLE_PLANS = {
+  "Airtel":[
+    {data:"1.5GB/day", validity:"28 days", price:199},
+    {data:"2GB/day", validity:"56 days", price:399},
+    {data:"3GB/day", validity:"84 days", price:599},
+  ],
+  "Jio":[
+    {data:"2GB/day", validity:"28 days", price:249},
+    {data:"1.5GB/day", validity:"70 days", price:349},
+    {data:"Unlimited Calls", validity:"28 days", price:199},
+  ],
+  "VI":[
+    {data:"1.5GB/day", validity:"28 days", price:219},
+    {data:"2GB/day", validity:"56 days", price:449},
+    {data:"SMS Pack", validity:"30 days", price:99},
+  ],
+  "BSNL":[
+    {data:"1GB/day", validity:"56 days", price:399},
+    {data:"500MB/day", validity:"84 days", price:599},
+    {data:"Topup 100", validity:"NA", price:100},
+  ]
+};
+
+function renderPlansFor(op){
+  const container = document.getElementById('plansList'); container.innerHTML='';
+  (SAMPLE_PLANS[op] || []).forEach(plan=>{
+    const div = document.createElement('div'); div.className='plan card';
+    div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+      <div><div class="price">₹ ${plan.price}</div><div class="small muted">${plan.data} • ${plan.validity}</div></div>
+      <div><button class="ok" onclick='applyPlan(${plan.price}, "${op}")'>Select</button></div>
+    </div>`;
+    container.appendChild(div);
+  });
+}
+
+function renderPlansPage(){
+  const container = document.getElementById('plansContainer'); container.innerHTML='';
+  Object.keys(SAMPLE_PLANS).forEach(op=>{
+    const box = document.createElement('div'); box.className='card'; box.style.marginBottom='12px';
+    box.innerHTML = `<h2 style="margin:0 0 8px 0">${op}</h2>`;
+    const list = document.createElement('div'); list.className='plans';
+    (SAMPLE_PLANS[op]||[]).forEach(pl=>{
+      const p = document.createElement('div'); p.className='plan';
+      p.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-weight:800">₹ ${pl.price}</div><div class="small muted">${pl.data} • ${pl.validity}</div></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="ok" onclick='applyPlan(${pl.price}, "${op}")'>Use</button>
+          <button class="small-ghost" onclick='document.getElementById("amountInput").value=${pl.price};go("home")'>Autofill</button>
+        </div>
+      </div>`;
+      list.appendChild(p);
+    });
+    box.appendChild(list);
+    container.appendChild(box);
+  });
+}
+
+function selectOperatorChip(el){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active-chip'));
+  el.classList.add('active-chip');
+  const op = el.dataset.op;
+  document.getElementById('operatorSelect').value = op;
+  renderPlansFor(op);
+  document.getElementById('selOp').textContent = op;
+}
+
+function applyPlan(price, op){
+  document.getElementById('amountInput').value = price;
+  document.getElementById('operatorSelect').value = op;
+  document.getElementById('selAmt').textContent = price;
+  document.getElementById('selOp').textContent = op;
+  document.getElementById('rechargeMsg').textContent = `Selected ${op} plan — ₹ ${price}`;
+}
+
+/* ======================
+   Recharge form handlers
+   ====================== */
+document.getElementById('rechargeForm').onsubmit = function(e){
+  e.preventDefault();
+  const mobile = document.getElementById('mobile').value.trim();
+  const operator = document.getElementById('operatorSelect').value;
+  const amount = Number(document.getElementById('amountInput').value);
+  if(!/^[0-9]{10}$/.test(mobile)){ alert('Enter a valid 10-digit mobile number'); return; }
+  if(!amount || amount<=0){ alert('Enter amount'); return; }
+
+  // store selected info to pay flow
+  localStorage.setItem('rn_pending', JSON.stringify({mobile,operator,amount}));
+  go('payment');
+};
+
+/* ======================
+   Payment page
+   ====================== */
+let selectedMethod = 'card';
+function renderPaymentPage(){
+  const pending = JSON.parse(localStorage.getItem('rn_pending') || "null");
+  if(!pending){ alert('No pending recharge.'); go('home'); return; }
+  document.getElementById('payMobile').textContent = pending.mobile;
+  document.getElementById('payOperator').textContent = pending.operator;
+  document.getElementById('payAmount').textContent = pending.amount;
+  document.getElementById('cardPayAmt').textContent = pending.amount;
+  document.getElementById('payNowBtn').style.display = 'none';
+  // recent recharges
+  const recent = loadRecharges().slice(-5).reverse();
+  const rlist = document.getElementById('recentRechargeList'); rlist.innerHTML = '';
+  if(recent.length===0){ rlist.textContent = 'No recent recharges'; }
+  else {
+    recent.forEach(r=>{
+      const d = document.createElement('div'); d.className='small muted';
+      d.style.marginBottom='8px';
+      d.textContent = `${new Date(r.when).toLocaleString()} • ${r.mobile} • ${r.operator} • ₹${r.amount}`;
+      rlist.appendChild(d);
+    });
+  }
+  selectMethod('card');
+}
+
+function selectMethod(m){
+  selectedMethod = m;
+  document.getElementById('cardForm').classList.toggle('hidden', m!=='card');
+  document.getElementById('upiForm').classList.toggle('hidden', m!=='upi');
+  document.getElementById('methodCard').classList.toggle('active-chip', m==='card');
+  document.getElementById('methodUPI').classList.toggle('active-chip', m==='upi');
+}
+
+/* Simulated payment processors */
+function processCardPayment(){
+  const card = document.getElementById('cardNumber').value.replace(/\s/g,'');
+  const exp = document.getElementById('cardExp').value;
+  const cvv = document.getElementById('cardCVV').value;
+  if(card.length<12 || cvv.length<3){ alert('Enter valid card details (demo)'); return; }
+  // simulate success
+  finalizePayment('CARD');
+}
+function processUpiPayment(){
+  const upi = document.getElementById('upiId').value.trim();
+  if(!upi.includes('@')){ alert('Enter valid UPI ID (demo)'); return; }
+  finalizePayment('UPI');
+}
+
+function finalizePayment(method){
+  const pending = JSON.parse(localStorage.getItem('rn_pending') || "null");
+  if(!pending){ alert('No pending'); go('home'); return; }
+  const sess = loadSession();
+  const rechs = loadRecharges();
+  const record = {
+    id: Date.now() + Math.floor(Math.random()*999),
+    when: Date.now(),
+    userEmail: sess && sess.type==='user' ? sess.email : null,
+    mobile: pending.mobile,
+    operator: pending.operator,
+    amount: pending.amount,
+    method: method,
+    status: 'SUCCESS'
+  };
+  rechs.push(record); saveRecharges(rechs);
+  // clear pending
+  localStorage.removeItem('rn_pending');
+  // show success
+  document.getElementById('successMsg').textContent = `₹ ${record.amount} successful via ${method}.`;
+  go('success');
+}
+
+/* ======================
+   History (user)
+   ====================== */
+function renderHistory(){
+  const sess = loadSession();
+  const tbody = document.querySelector('#historyTable tbody');
+  tbody.innerHTML='';
+  const rechs = loadRecharges().slice().reverse();
+  const filtered = sess && sess.type==='user' ? rechs.filter(r=>r.userEmail === sess.email) : rechs;
+  filtered.forEach(r=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${new Date(r.when).toLocaleString()}</td>
+      <td>${r.mobile}</td><td>${r.operator}</td><td>₹ ${r.amount}</td><td>${r.status}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ======================
+   Recent UI refresh & helpers
+   ====================== */
+function refreshUI(){
+  refreshAuthArea();
+  // update selected preview
+  const mobile = document.getElementById('mobile').value.trim() || '—';
+  document.getElementById('selMob').textContent = mobile;
+  const op = document.getElementById('operatorSelect').value;
+  document.getElementById('selOp').textContent = op;
+  const amt = document.getElementById('amountInput').value || '—';
+  document.getElementById('selAmt').textContent = amt;
+  // disabled pay if no amount
+  document.getElementById('payNowBtn').disabled = !(Number(amt) > 0);
+}
+
+/* ======================
+   Pay Now from sidebar (ensures pending saved)
+   ====================== */
+function payNow(){
+  const mobile = document.getElementById('mobile').value.trim();
+  const operator = document.getElementById('operatorSelect').value;
+  const amount = Number(document.getElementById('amountInput').value);
+  if(!/^[0-9]{10}$/.test(mobile)){ alert('Enter valid 10-digit mobile number'); return; }
+  if(!amount || amount<=0){ alert('Enter amount'); return; }
+  localStorage.setItem('rn_pending', JSON.stringify({mobile,operator,amount}));
+  go('payment');
+}
+
+/* ======================
+   Export history
+   ====================== */
+function exportHistory(){
+  const data = loadRecharges();
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'recharges.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ======================
+   Admin utilities exposed to global scope
+   ====================== */
+window.adminDeleteUser = adminDeleteUser;
+window.adminDeleteRecharge = adminDeleteRecharge;
+
+/* ======================
+   Apply theme toggle & set initial
+   ====================== */
+document.getElementById('themeToggle').onclick = ()=>{
+  const t = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  setTheme(t);
+};
+setTheme(getTheme());
+
+/* ======================
+   Auth area initial render
+   ====================== */
+refreshAuthArea();
+
+/* ======================
+   Initial plans render and event bindings
+   ====================== */
+selectOperatorChip(document.querySelector('.chip[data-op="Airtel"]'));
+renderPlansFor('Airtel');
+
+/* ======================
+   Auth form submission
+   ====================== */
+document.getElementById('authForm').onsubmit = (e)=>{ e.preventDefault(); /* handler set dynamically */ };
+
+/* ======================
+   Initial route
+   ====================== */
+go('home');
+
+/* ======================
+   Expose some helpers to global for debugging (optional)
+   ====================== */
+window._ls = localStorage;
+window._users = loadUsers;
+window._rechs = loadRecharges;
+</script>
+</body>
+</html>

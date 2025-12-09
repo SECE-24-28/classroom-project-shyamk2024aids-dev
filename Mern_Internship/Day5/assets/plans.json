@@ -1,0 +1,66 @@
+[
+  {
+    "id": "1",
+    "type": "prepaid",
+    "price": 199,
+    "validity": "28 days",
+    "data": "1.5GB/day",
+    "description": "Unlimited calls + 100 SMS/day"
+  },
+  {
+    "id": "2",
+    "type": "prepaid",
+    "price": 299,
+    "validity": "28 days",
+    "data": "2GB/day",
+    "description": "Unlimited calls + 100 SMS/day"
+  },
+  {
+    "id": "3",
+    "type": "prepaid",
+    "price": 449,
+    "validity": "56 days",
+    "data": "3GB/day",
+    "description": "Unlimited calls + 100 SMS/day"
+  },
+  {
+    "id": "4",
+    "type": "postpaid",
+    "price": 399,
+    "validity": "1 month",
+    "data": "75GB",
+    "description": "Postpaid plan with data pack"
+  },
+  {
+    "id": "5",
+    "type": "prepaid",
+    "price": 99,
+    "validity": "14 days",
+    "data": "1GB/day",
+    "description": "Budget plan"
+  },
+  {
+    "id": "6",
+    "type": "prepaid",
+    "price": 555,
+    "validity": "84 days",
+    "data": "2.5GB/day",
+    "description": "Long validity plan"
+  },
+  {
+    "id": "7",
+    "type": "postpaid",
+    "price": 799,
+    "validity": "1 month",
+    "data": "120GB",
+    "description": "Premium postpaid"
+  },
+  {
+    "id": "8",
+    "type": "prepaid",
+    "price": 49,
+    "validity": "7 days",
+    "data": "0.5GB/day",
+    "description": "Short pack"
+  }
+]
